@@ -1,0 +1,43 @@
+# 1. Environnement
+python -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# 2. TEST
+cd src/mlops_tp
+python train.py
+
+# 3. VÉRIFIER
+ls -la artifacts/
+
+# ARRÊTER Ctrl+C d'abord
+
+# CORRECT : depuis src/mlops_tp/
+cd src/mlops_tp
+uvicorn api:app --host 127.0.0.1 --port 8000 --reload
+# CORRECT : depuis la racine du projet
+uvicorn src.mlops_tp.api:app --host 127.0.0.1 --port 8000 --reload
+
+
+#donnée test api
+{
+  "features": {
+    "alcohol": 14.23,
+    "malic_acid": 1.71,
+    "ash": 2.43,
+    "alcalinity_of_ash": 15.6,
+    "magnesium": 127.0,
+    "total_phenols": 2.8,
+    "flavanoids": 3.06,
+    "nonflavanoid_phenols": 0.28,
+    "proanthocyanins": 2.29,
+    "color_intensity": 5.64,
+    "hue": 1.04,
+    "od280/od315_of_diluted_wines": 3.92,
+    "proline": 1065.0
+  }
+}
+
+# build l'image Docker
+docker build -t mlops-wine .
