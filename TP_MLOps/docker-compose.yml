@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: winer_api
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app/src
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./artifacts:/app/artifacts  #hot-reload of the models 
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    container_name: winer_frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000  # Point to the API service
+    depends_on:
+      - api

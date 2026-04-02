@@ -1,97 +1,194 @@
-
 import os
 import json
 import joblib
 import pandas as pd
 import numpy as np
 from pathlib import Path
+
+import mlflow
+import mlflow.sklearn
+from mlflow.models import infer_signature  
+
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
 from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
+
 from config import *
 
-'''artifacts_dir = Path("src/mlops_tp/artifacts")'''
+# =========================
+# Dossier artefacts
+# =========================
 artifacts_dir = Path(__file__).parent / "artifacts"
 artifacts_dir.mkdir(exist_ok=True)
 
-#Chargement des données et affichage du dataset
+# =========================
+# MLflow setup
+# =========================
+mlflow.set_experiment("wine_classification")
 
-print("🍷 Chargement dataset Wine...")
-data = load_wine(as_frame=True)
-X = data.data
-y = data.target
+with mlflow.start_run():
 
-print(f"📊 Dataset: {X.shape[0]} échantillons, {X.shape[1]} features")
-print(f"🎯 Classes: {np.unique(y)} (distribution: {np.bincount(y)})")
+    # =========================
+    # Chargement des données
+    # =========================
+    print("🍷 Chargement dataset Wine...")
+    data = load_wine(as_frame=True)
+    X = data.data
+    y = data.target
 
-#Separation de dataset en train/val/test
-print("\n🔪 Split train/val/test...")
-X_temp, X_test, y_temp, y_test = train_test_split(
-    X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y
-)
-X_train, X_val, y_train, y_val = train_test_split(
-    X_temp, y_temp, test_size=VAL_SIZE, random_state=RANDOM_STATE, stratify=y_temp
-)
+    print(f"📊 Dataset: {X.shape[0]} échantillons, {X.shape[1]} features")
+    print(f"🎯 Classes: {np.unique(y)} (distribution: {np.bincount(y)})")
 
-print(f"Train: {X_train.shape}, Val: {X_val.shape}, Test: {X_test.shape}")
+    # =========================
+    # Split
+    # =========================
+    print("\n🔪 Split train/val/test...")
+    X_temp, X_test, y_temp, y_test = train_test_split(
+        X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y
+    )
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_temp, y_temp, test_size=VAL_SIZE, random_state=RANDOM_STATE, stratify=y_temp
+    )
 
-#Pipeline de preprocessing et classification
-print("\n🏭 Pipeline...")
-pipeline = Pipeline([
-    ("scaler", StandardScaler()),
-    ("classifier", RandomForestClassifier(n_estimators=100, random_state=RANDOM_STATE, n_jobs=-1))
-])
+    print(f"Train: {X_train.shape}, Val: {X_val.shape}, Test: {X_test.shape}")
 
-#Entraînement et évaluation/metriques
-print("🚀 Entraînement...")
-pipeline.fit(X_train, y_train)
+    # =========================
+    # Pipeline
+    # =========================
+    print("\n🏭 Pipeline...")
+    n_estimators = 100
 
-train_acc = accuracy_score(y_train, pipeline.predict(X_train))
-val_acc = accuracy_score(y_val, pipeline.predict(X_val))
-test_acc = accuracy_score(y_test, pipeline.predict(X_test))
-train_f1 = f1_score(y_train, pipeline.predict(X_train), average='macro')
-val_f1 = f1_score(y_val, pipeline.predict(X_val), average='macro')
-test_f1 = f1_score(y_test, pipeline.predict(X_test), average='macro')
+    pipeline = Pipeline([
+        ("scaler", StandardScaler()),
+        ("classifier", RandomForestClassifier(
+            n_estimators=n_estimators,
+            random_state=RANDOM_STATE,
+            n_jobs=-1
+        ))
+    ])
 
-metrics = {
-    "timestamp": pd.Timestamp.now().isoformat(),
-    "train_accuracy": float(train_acc),
-    "val_accuracy": float(val_acc),
-    "test_accuracy": float(test_acc),
-    "train_f1_macro": float(train_f1),
-    "val_f1_macro": float(val_f1),
-    "test_f1_macro": float(test_f1),
-    "hyperparams": {"n_estimators": 100, "random_state": RANDOM_STATE}
-}
+    # =========================
+    # Entraînement
+    # =========================
+    print("🚀 Entraînement...")
+    pipeline.fit(X_train, y_train)
 
-print(f"\n📈 Test: Acc={test_acc:.3f}, F1={test_f1:.3f}")
+    # =========================
+    # Prédictions
+    # =========================
+    y_train_pred = pipeline.predict(X_train)
+    y_val_pred = pipeline.predict(X_val)
+    y_test_pred = pipeline.predict(X_test)
 
-#Sauvegarde  des artefacts (modèle, métriques, schema des features)
-print("\n💾 Sauvegarde...")
-joblib.dump(pipeline, artifacts_dir / "model.joblib")
+    # =========================
+    # Métriques
+    # =========================
+    train_acc = accuracy_score(y_train, y_train_pred)
+    val_acc = accuracy_score(y_val, y_val_pred)
+    test_acc = accuracy_score(y_test, y_test_pred)
 
-with open(artifacts_dir / "metrics.json", "w") as f:
-    json.dump(metrics, f, indent=2)
+    train_f1 = f1_score(y_train, y_train_pred, average='macro')
+    val_f1 = f1_score(y_val, y_val_pred, average='macro')
+    test_f1 = f1_score(y_test, y_test_pred, average='macro')
 
-feature_schema = {col: str(X[col].dtype) for col in X.columns}
-with open(artifacts_dir / "feature_schema.json", "w") as f:
-    json.dump(feature_schema, f, indent=2)
+    print(f"\n📈 Test: Acc={test_acc:.3f}, F1={test_f1:.3f}")
 
-#Informations sur le run (dataset, shape, target, classes, split ratios, timestamp)
-run_info = {
-    "dataset_name": DATASET_NAME,
-    "shape": list(X.shape),
-    "target": str(y.name),
-    "n_classes": int(np.unique(y).size),
-    "split_ratios": {"train": 0.70, "val": 0.15, "test": 0.15},
-    "random_state": RANDOM_STATE,
-    "timestamp": pd.Timestamp.now().isoformat()
-}
-with open(artifacts_dir / "run_info.json", "w") as f:
-    json.dump(run_info, f, indent=2)
+    # =========================
+    # MLflow Logging
+    # =========================
+    # Paramètres
+    mlflow.log_param("model_type", "RandomForest")
+    mlflow.log_param("n_estimators", n_estimators)
+    mlflow.log_param("random_state", RANDOM_STATE)
 
-print("\n🎉 4 ARTEFACTS GÉNÉRÉS !")
+    # Métriques
+    mlflow.log_metric("train_accuracy", train_acc)
+    mlflow.log_metric("val_accuracy", val_acc)
+    mlflow.log_metric("test_accuracy", test_acc)
 
+    mlflow.log_metric("train_f1_macro", train_f1)
+    mlflow.log_metric("val_f1_macro", val_f1)
+    mlflow.log_metric("test_f1_macro", test_f1)
+
+    # =========================
+    # Artefact : matrice de confusion
+    # =========================
+    print("\n📊 Génération matrice de confusion...")
+
+    cm = confusion_matrix(y_test, y_test_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+    disp.plot()
+
+    cm_path = artifacts_dir / "confusion_matrix.png"
+    plt.savefig(cm_path)
+    plt.close()
+
+    mlflow.log_artifact(cm_path)
+
+    # =========================
+    # Sauvegarde locale
+    # =========================
+    print("\n💾 Sauvegarde...")
+
+    joblib.dump(pipeline, artifacts_dir / "model.joblib")
+
+    metrics = {
+        "timestamp": pd.Timestamp.now().isoformat(),
+        "train_accuracy": float(train_acc),
+        "val_accuracy": float(val_acc),
+        "test_accuracy": float(test_acc),
+        "train_f1_macro": float(train_f1),
+        "val_f1_macro": float(val_f1),
+        "test_f1_macro": float(test_f1),
+        "hyperparams": {
+            "n_estimators": n_estimators,
+            "random_state": RANDOM_STATE
+        }
+    }
+
+    with open(artifacts_dir / "metrics.json", "w") as f:
+        json.dump(metrics, f, indent=2)
+
+    feature_schema = {col: str(X[col].dtype) for col in X.columns}
+    with open(artifacts_dir / "feature_schema.json", "w") as f:
+        json.dump(feature_schema, f, indent=2)
+
+    run_info = {
+        "dataset_name": DATASET_NAME,
+        "shape": list(X.shape),
+        "target": str(y.name),
+        "n_classes": int(np.unique(y).size),
+        "split_ratios": {"train": 0.70, "val": 0.15, "test": 0.15},
+        "random_state": RANDOM_STATE,
+        "timestamp": pd.Timestamp.now().isoformat()
+    }
+
+    with open(artifacts_dir / "run_info.json", "w") as f:
+        json.dump(run_info, f, indent=2)
+
+    # =========================
+    # MLflow artefacts
+    # =========================
+    mlflow.log_artifact(artifacts_dir / "model.joblib")
+    mlflow.log_artifact(artifacts_dir / "metrics.json")
+    mlflow.log_artifact(artifacts_dir / "feature_schema.json")
+    mlflow.log_artifact(artifacts_dir / "run_info.json")
+
+    # MODÈLE MLflow AVEC SIGNATURE (fix warnings)
+    signature = infer_signature(X_test, y_test_pred)
+    input_example = X_test.iloc[[0]].to_dict('records')[0]  # Exemple input
+
+    mlflow.sklearn.log_model(
+        pipeline, 
+        "wine_rf_model",  
+        signature=signature,
+        input_example=input_example
+    )
+
+    print("\n RUN MLflow COMPLET SANS WARNINGS !")

@@ -1,12 +1,10 @@
 FROM python:3.11-slim AS builder
-
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip wheel --no-cache-dir --no-deps -r requirements.txt --wheel-dir /wheels
 
-FROM python:3.11-slim AS runtime
-
+FROM python:3.11-slim AS runtime  
 WORKDIR /app
 COPY --from=builder /wheels /wheels
 COPY --from=builder /app/requirements.txt .
@@ -23,5 +21,4 @@ HEALTHCHECK --interval=30s --timeout=3s \
 
 EXPOSE 8000
 ENV PYTHONPATH=/app/src PYTHONUNBUFFERED=1
-
 CMD ["uvicorn", "mlops_tp.api:app", "--host", "0.0.0.0", "--port", "8000"]
