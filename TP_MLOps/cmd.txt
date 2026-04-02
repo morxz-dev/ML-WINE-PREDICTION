@@ -1,24 +1,3 @@
-# 1. Environnement
-python -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
-
-# 2. TEST
-cd src/mlops_tp
-python train.py
-
-# 3. VÉRIFIER
-ls -la artifacts/
-
-# ARRÊTER Ctrl+C d'abord
-
-# CORRECT : depuis src/mlops_tp/
-cd src/mlops_tp
-uvicorn api:app --host 127.0.0.1 --port 8000 --reload
-# CORRECT : depuis la racine du projet
-uvicorn src.mlops_tp.api:app --host 127.0.0.1 --port 8000 --reload
-
 
 #donnée test api
 {
@@ -39,35 +18,19 @@ uvicorn src.mlops_tp.api:app --host 127.0.0.1 --port 8000 --reload
   }
 }
 
+
+api:
+uvicorn src.mlops_tp.api:app --reload --host 0.0.0.0 --port 8000
+front :
+streamlit run frontend/app.py
+mlflow:
+mlflow ui --port 5001
+
+
+
 # build l'image Docker
 docker compose build 
 docker compose up
-
 docker compose down
 docker compose up --build
- l'api ne se lance pas en mm tps que le front , a corriger 
 
-
-
-uvicorn src.mlops_tp.api:app --reload --host 0.0.0.0 --port 8000
-streamlit run frontend.py
-mlflow ui --port 5001
-
-tp2
-source venv/bin/activate
-pip install mlflow
-mlflow
-mlflow ui --port 5001
-
-
-is my api working ?
-
-PYTHONPATH=. uvicorn main:app --reload
-status must be ok
-http://127.0.0.1:8000/health
-http://http://127.0.0.1:8000/docs
-must work too 
-
-
-execution du streamlit
-streamlit run frontend/app.py

@@ -2,7 +2,7 @@ import pytest
 import os
 from pathlib import Path
 import joblib
-from src.mlops_tp.train import artifacts_dir  # On va importer
+from src.mlops_tp.train import artifacts_dir  
 
 def test_training_pipeline_creates_model():
     """Teste que train.py génère model.joblib"""

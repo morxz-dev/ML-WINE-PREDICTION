@@ -12,3 +12,4 @@ requests
 ydata-synthetic
 python-multipart
 mlflow
+streamlit==1.39.0

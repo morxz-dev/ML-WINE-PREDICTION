@@ -1,7 +1,7 @@
 import pandas as pd
 from ydata_synthetic.synthesizers import GaussianCopula
 
-# Charger tes données originales
+# Charger les données originales
 data = pd.read_csv("data/wine.csv")  # ou ton CSV de features
 
 # Créer le synthétiseur
