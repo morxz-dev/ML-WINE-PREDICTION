@@ -1,3 +1,5 @@
+#Author: Mènéli Herve Adjole
+
 import os
 import json
 import joblib
@@ -192,3 +194,5 @@ with mlflow.start_run():
     )
 
     print("\n RUN MLflow COMPLET SANS WARNINGS !")
+
+#Author: Mènéli Herve Adjole

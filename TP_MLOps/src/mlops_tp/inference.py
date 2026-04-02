@@ -1,3 +1,4 @@
+#Author: Mènéli Herve Adjole
 import pytest
 import joblib
 from pathlib import Path
@@ -37,3 +38,6 @@ def test_model_predict():
         assert len(proba) == 3, "3 probas attendues pour 3 classes"
         assert np.all(proba >= 0) and np.all(proba <= 1), "Probas entre 0 et 1"
         assert np.isclose(proba.sum(), 1.0), "Probas doivent sommer à 1"
+
+
+#Author: Mènéli Herve Adjole

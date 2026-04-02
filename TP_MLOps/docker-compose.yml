@@ -25,3 +25,5 @@ services:
       - API_URL=http://api:8000  # Point to the API service
     depends_on:
       - api
+
+#Author: Mènéli Herve Adjole

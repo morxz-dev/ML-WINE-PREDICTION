@@ -1,3 +1,4 @@
+#Author: Mènéli Herve Adjole
 import pytest
 import os
 from pathlib import Path
@@ -21,3 +22,5 @@ def test_training_pipeline_creates_model():
     assert hasattr(model, 'predict'), "Modèle n'a pas predict()"
     
     print("✅ test_training_pipeline_creates_model OK")
+
+#Author: Mènéli Herve Adjole

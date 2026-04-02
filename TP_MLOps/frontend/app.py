@@ -1,4 +1,4 @@
-import streamlit as st
+#Author: Mènéli Herve Adjole
 import requests
 import pandas as pd
 import json
@@ -18,7 +18,7 @@ features_list = [
     "color_intensity", "hue", "od280/od315_of_diluted_wines",
     "proline"
 ]
-
+#Author: Mènéli Herve Adjole
 input_data = None
 
 # --- Mode manuel ---
@@ -93,3 +93,6 @@ if st.sidebar.button("🔮 Prédire"):
 # Infos API
 st.sidebar.markdown("---")
 st.sidebar.info("**API Status:** http://localhost:8000/health")
+
+
+#Author: Mènéli Herve Adjole

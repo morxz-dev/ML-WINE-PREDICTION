@@ -1,3 +1,5 @@
+#Author: Mènéli Herve Adjole
+
 Context: Ce dataset est le resultat d'une analyse de vins produit dans une même région en Italie mais par 03 differents producteurs.L'analyse mesure **13 constituants chimiques** 
 (source:https://www.openml.org/search?type=data&status=active&id=43612)
 
@@ -23,7 +25,7 @@ ML FLOW
     métriques
     artefacts
     modèle
-
+#Author: Mènéli Herve Adjole
 
 ### Différence paramètre / métrique / artefact
     Paramètre : configuration du modèle (ex: n_estimators)
@@ -156,3 +158,5 @@ Utilisé par plateformes cloud pour monitoring et restart
 ### CI vs CD
 CI (Continuous Integration) : tester automatiquement le code
 CD (Continuous Delivery/Deployment) : déployer automatiquement
+
+#Author: Mènéli Herve Adjole

@@ -1,3 +1,4 @@
+#Author: Mènéli Herve Adjole
 from pydantic import BaseModel, ConfigDict
 from typing import Dict, Any, List , Optional
 from pathlib import Path
@@ -89,3 +90,5 @@ def get_task_type():
         return _run_info["task"]
 
     return "classification"
+
+#Author: Mènéli Herve Adjole

@@ -15,3 +15,5 @@ synthetic_data = model.sample(100)  # 100 lignes synthétiques
 synthetic_data.to_csv("data/wine_synthetic.csv", index=False)
 
 print(synthetic_data.head())
+
+#Author: Mènéli Herve Adjole

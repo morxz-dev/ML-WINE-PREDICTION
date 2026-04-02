@@ -22,7 +22,7 @@ feature_schema = get_feature_schema()
 @app.get("/health")
 def health():
     return {"status": "ok"}
-
+#Author: Mènéli Herve Adjole
 
 # Endpoint prédiction
 @app.post("/predict", response_model=PredictionResponse)
@@ -59,3 +59,4 @@ async def predict(request: PredictionRequest):
         task=get_task_type(),
         latency_ms=round(latency_ms, 2)
     )
+#Author: Mènéli Herve Adjole
