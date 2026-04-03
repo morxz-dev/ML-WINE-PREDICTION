@@ -98,3 +98,5 @@ if st.sidebar.button("Prédire"):
 st.sidebar.markdown("---")
 st.sidebar.info("**API Status:** https://ml-wine-prediction.onrender.com/health")
 st.sidebar.info("**API Docs:** https://ml-wine-prediction.onrender.com/docs")
+
+st.sidebar.info("**Author:** Mènéli Herve Adjole")
