@@ -1,4 +1,5 @@
 #Author: Mènéli Herve Adjole
+import os
 import requests
 import pandas as pd
 import json
@@ -56,12 +57,27 @@ else:
 # --- Bouton prédiction ---
 API_URL = "https://ml-wine-prediction.onrender.com/predict"
 
+def get_api_headers():
+    """
+    Retourne les headers pour éviter le 403 sur Render.
+    Utilise User-Agent et clé API si définie dans les secrets.
+    """
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Content-Type": "application/json"
+    }
+    api_key = os.environ.get("RENDER_API_KEY")  # à définir si service privé
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+    return headers
+
 if st.sidebar.button("Prédire"):
     if input_data is not None and not input_data.empty:
         with st.spinner("Prédiction en cours..."):
             try:
                 features_payload = input_data.to_dict(orient="records")
-                response = requests.post(API_URL, json={"features": features_payload}, timeout=10)
+                headers = get_api_headers()
+                response = requests.post(API_URL, json={"features": features_payload}, headers=headers, timeout=10)
 
                 # Debug : afficher status code et contenu brut
                 st.write(f"Status code API: {response.status_code}")
@@ -98,5 +114,4 @@ if st.sidebar.button("Prédire"):
 st.sidebar.markdown("---")
 st.sidebar.info("**API Status:** https://ml-wine-prediction.onrender.com/health")
 st.sidebar.info("**API Docs:** https://ml-wine-prediction.onrender.com/docs")
-
 st.sidebar.info("**Author:** Mènéli Herve Adjole")
