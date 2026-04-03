@@ -2,6 +2,7 @@
 import requests
 import pandas as pd
 import json
+import streamlit as st
 
 st.set_page_config(page_title="Prédiction ML", layout="wide")
 st.title("🧪 Prédiction Machine Learning")
