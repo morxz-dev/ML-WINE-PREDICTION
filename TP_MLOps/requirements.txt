@@ -5,11 +5,10 @@ joblib
 fastapi
 uvicorn[standard]
 pydantic
-pytest
-httpx
+#pytest
+#httpx
 streamlit
 requests
-ydata-synthetic
+#ydata-synthetic
 python-multipart
 mlflow
-streamlit==1.39.0
