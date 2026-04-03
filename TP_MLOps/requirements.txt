@@ -12,3 +12,6 @@ requests
 #ydata-synthetic
 python-multipart
 mlflow
+
+#front 
+streamlit
