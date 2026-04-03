@@ -19,7 +19,7 @@ features_list = [
     "color_intensity", "hue", "od280/od315_of_diluted_wines",
     "proline"
 ]
-#Author: Mènéli Herve Adjole
+
 input_data = None
 
 # --- Mode manuel ---
@@ -38,42 +38,35 @@ else:
             if uploaded_file.name.endswith(".csv"):
                 input_data = pd.read_csv(uploaded_file)
             else:
-                # Lire JSON avec {"features": [...] }
                 raw = json.load(uploaded_file)
                 input_data = pd.DataFrame(raw["features"])
             
             st.subheader("Données chargées :")
             st.dataframe(input_data)
 
-            # Vérifier que toutes les colonnes sont présentes
             missing_cols = set(features_list) - set(input_data.columns)
             if missing_cols:
                 st.error(f"Colonnes manquantes : {missing_cols}")
             else:
-                # Sélectionner uniquement les colonnes attendues
                 input_data = input_data[features_list]
 
         except Exception as e:
             st.error(f"Erreur de lecture du fichier : {e}")
 
 # --- Bouton prédiction ---
+API_URL = "https://ml-wine-prediction.onrender.com/predict"  # <- ton URL de service en ligne
+
 if st.sidebar.button("🔮 Prédire"):
     if input_data is not None and not input_data.empty:
         with st.spinner("Prédiction en cours..."):
             try:
-                # Préparer le batch pour l'API
                 features_payload = input_data.to_dict(orient="records")
-                response = requests.post(
-                    "http://localhost:8000/predict",
-                    json={"features": features_payload},
-                    timeout=10
-                )
+                response = requests.post(API_URL, json={"features": features_payload}, timeout=10)
                 result = response.json()
 
                 predictions = result.get("predictions", [])
                 probas = result.get("proba", [])
 
-                # Affichage des résultats
                 st.subheader("Résultats des prédictions")
                 for i, row in input_data.iterrows():
                     st.markdown(f"### Ligne {i+1}")
@@ -93,7 +86,4 @@ if st.sidebar.button("🔮 Prédire"):
 
 # Infos API
 st.sidebar.markdown("---")
-st.sidebar.info("**API Status:** http://localhost:8000/health")
-
-
-#Author: Mènéli Herve Adjole
+st.sidebar.info("**API Status:** https://ml-wine-prediction.onrender.com/health")
