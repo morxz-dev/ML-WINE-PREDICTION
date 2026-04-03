@@ -3,6 +3,71 @@
 Context: Ce dataset est le resultat d'une analyse de vins produit dans une même région en Italie mais par 03 differents producteurs.L'analyse mesure **13 constituants chimiques** 
 (source:https://www.openml.org/search?type=data&status=active&id=43612)
 
+
+Wine Prediction MLOps Project
+Description
+
+Ce projet fournit un service de prédiction de la qualité des vins basé sur un modèle de machine learning.
+Il inclut :
+
+Une API REST pour les prédictions (FastAPI).
+Une interface web Streamlit pour tester facilement le modèle.
+Un pipeline MLOps simple avec gestion des artefacts et des métriques.
+
+Le projet est conçu pour démontrer les bonnes pratiques de déploiement de modèles ML avec un service public.
+
+Fonctionnalités
+Prédiction de la qualité des vins à partir de 13 caractéristiques chimiques.
+
+Deux modes d’entrée :
+Saisie manuelle des features via l’interface.
+Chargement d’un fichier CSV ou JSON contenant les features.
+Retour des prédictions et de la probabilité associée (confiance du modèle).
+Interface simple et responsive avec Streamlit.
+Documentation et endpoints accessibles via /docs sur l’API FastAPI.
+
+Déploiement
+L’API est déployée sur Render :
+https://ml-wine-prediction.onrender.com
+Endpoints principaux :
+/predict : POST → Prédiction des vins
+/health : GET → Vérifier que l’API est en ligne
+/docs : Swagger UI de la documentation
+
+Frontend
+L’interface Streamlit est connectée à l’API.
+Lance-la localement avec :
+pip install -r requirements.txt
+streamlit run app.py
+
+Exemple de requête JSON
+{
+  "features": [
+    {
+      "alcohol": 14.23,
+      "malic_acid": 1.71,
+      "ash": 2.43,
+      "alcalinity_of_ash": 15.6,
+      "magnesium": 127.0,
+      "total_phenols": 2.8,
+      "flavanoids": 3.06,
+      "nonflavanoid_phenols": 0.28,
+      "proanthocyanins": 2.29,
+      "color_intensity": 5.64,
+      "hue": 1.04,
+      "od280/od315_of_diluted_wines": 3.92,
+      "proline": 1065.0
+    }
+  ]
+}
+
+
+Auteur
+Mènéli Herve Adjole
+LinkedIn : (https://www.linkedin.com/in/herve-adjole/)
+GitHub : (https://github.com/morxz-dev)
+
+
 ### Tâche: Classification (multiclasse)
 
 ### Anatomie des données: 178 échantillons × 13 features numériques + 1 cible
@@ -14,6 +79,8 @@ Context: Ce dataset est le resultat d'une analyse de vins produit dans une même
     #Pas de variable manquantes
     #Déséquilibre léger
     #Dataset propre
+
+
 
 
 ML FLOW
@@ -109,7 +176,7 @@ trouver le meilleur compromis performance/coût
 
 
 ### Métrique utilisée
-f1-score (macro)(car plus robuste que accur
+f1-score (macro) car plus robuste que accurary
 
 
 ### Compromis observé
