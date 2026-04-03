@@ -6,7 +6,7 @@ import streamlit as st
 
 st.set_page_config(page_title="Prédiction ML", layout="wide")
 st.title("🧪 Prédiction Machine Learning")
-st.markdown("Interface pour ton API MLOps")
+st.markdown("Interface API MLOps")
 
 # Sidebar pour choisir le mode d'entrée
 st.sidebar.header("📥 Mode d'entrée")
@@ -54,9 +54,9 @@ else:
             st.error(f"Erreur de lecture du fichier : {e}")
 
 # --- Bouton prédiction ---
-API_URL = "https://ml-wine-prediction.onrender.com/predict"  # <- ton URL de service en ligne
+API_URL = "https://ml-wine-prediction.onrender.com/predict"  # <- URL de service en ligne
 
-if st.sidebar.button("🔮 Prédire"):
+if st.sidebar.button("Prédire"):
     if input_data is not None and not input_data.empty:
         with st.spinner("Prédiction en cours..."):
             try:
@@ -87,3 +87,4 @@ if st.sidebar.button("🔮 Prédire"):
 # Infos API
 st.sidebar.markdown("---")
 st.sidebar.info("**API Status:** https://ml-wine-prediction.onrender.com/health")
+st.sidebar.info("**API Docs:** https://ml-wine-prediction.onrender.com/docs")
