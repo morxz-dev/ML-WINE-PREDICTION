@@ -1,3 +1,4 @@
+'''
 #Author: Mènéli Herve Adjole
 import os
 import requests
@@ -115,3 +116,100 @@ st.sidebar.markdown("---")
 st.sidebar.info("**API Status:** https://ml-wine-prediction.onrender.com/health")
 st.sidebar.info("**API Docs:** https://ml-wine-prediction.onrender.com/docs")
 st.sidebar.info("**Author:** Mènéli Herve Adjole")
+'''
+# Author: Mènéli Herve Adjole
+import joblib
+import pandas as pd
+import streamlit as st
+from pathlib import Path
+
+st.set_page_config(page_title="Prédiction ML", layout="wide")
+st.title("🧪 Prédiction Machine Learning")
+st.markdown("Interface Streamlit utilisant le modèle local")
+
+# Chemin vers le modèle local
+MODEL_PATH = Path(__file__).resolve().parent.parent / "src" / "mlops_tp" / "artifacts" / "model.joblib"
+
+# Charger le modèle
+model = joblib.load(MODEL_PATH)
+
+# Liste des features attendues
+features_list = [
+    "alcohol", "malic_acid", "ash", "alcalinity_of_ash",
+    "magnesium", "total_phenols", "flavanoids",
+    "nonflavanoid_phenols", "proanthocyanins",
+    "color_intensity", "hue", "od280/od315_of_diluted_wines",
+    "proline"
+]
+
+input_data = None
+
+# --- Mode d'entrée ---
+st.sidebar.header("📥 Mode d'entrée")
+input_mode = st.sidebar.radio("Choisir une option :", ["Manuel", "Depuis fichier"])
+
+# --- Mode manuel ---
+if input_mode == "Manuel":
+    st.sidebar.header("📊 Features à prédire")
+    features = {}
+    for feature in features_list:
+        features[feature] = st.sidebar.number_input(feature, value=0.0, step=0.1)
+    input_data = pd.DataFrame([features])
+
+# --- Mode fichier ---
+else:
+    uploaded_file = st.sidebar.file_uploader("Charger un fichier CSV ou JSON", type=["csv", "json"])
+    if uploaded_file:
+        try:
+            if uploaded_file.name.endswith(".csv"):
+                input_data = pd.read_csv(uploaded_file)
+            else:
+                raw = pd.read_json(uploaded_file)
+                input_data = pd.DataFrame(raw["features"])
+
+            st.subheader("Données chargées :")
+            st.dataframe(input_data)
+
+            # Vérifier les colonnes
+            missing_cols = set(features_list) - set(input_data.columns)
+            if missing_cols:
+                st.error(f"Colonnes manquantes : {missing_cols}")
+            else:
+                input_data = input_data[features_list]
+
+        except Exception as e:
+            st.error(f"Erreur de lecture du fichier : {e}")
+
+# --- Bouton prédiction ---
+if st.sidebar.button("Prédire"):
+    if input_data is not None and not input_data.empty:
+        with st.spinner("Prédiction en cours..."):
+            try:
+                predictions = model.predict(input_data)
+                # Si le modèle fournit aussi les probabilités
+                probas = None
+                if hasattr(model, "predict_proba"):
+                    probas = model.predict_proba(input_data)
+
+                st.subheader("Résultats des prédictions")
+                for i, row in input_data.iterrows():
+                    st.markdown(f"### Ligne {i+1}")
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.metric("Prédiction", predictions[i])
+                        if probas is not None:
+                            st.metric("Confiance", f"{max(probas[i]):.2%}")
+                    with col2:
+                        if probas is not None:
+                            st.json({f"Classe {j}": prob for j, prob in enumerate(probas[i])})
+
+            except Exception as e:
+                st.error(f"Erreur lors de la prédiction : {e}")
+    else:
+        st.warning("Veuillez saisir des données ou charger un fichier avant de prédire.")
+
+# Infos sur le projet
+st.sidebar.markdown("---")
+st.sidebar.info("**Author:** Mènéli Herve Adjole")
+st.sidebar.info("**Modèle local:** model.joblib")
+st.sidebar.info("**Features attendues:** " + ", ".join(features_list))
