@@ -54,7 +54,7 @@ else:
             st.error(f"Erreur de lecture du fichier : {e}")
 
 # --- Bouton prédiction ---
-API_URL = "https://ml-wine-prediction.onrender.com/predict"  # <- URL de service en ligne
+API_URL = "https://ml-wine-prediction.onrender.com/predict"
 
 if st.sidebar.button("Prédire"):
     if input_data is not None and not input_data.empty:
@@ -62,7 +62,17 @@ if st.sidebar.button("Prédire"):
             try:
                 features_payload = input_data.to_dict(orient="records")
                 response = requests.post(API_URL, json={"features": features_payload}, timeout=10)
-                result = response.json()
+
+                # Debug : afficher status code et contenu brut
+                st.write(f"Status code API: {response.status_code}")
+                st.write(f"Contenu brut API: {response.text[:500]}")  # limiter affichage à 500 caractères
+
+                # Vérifier si la réponse est JSON
+                try:
+                    result = response.json()
+                except json.JSONDecodeError:
+                    st.error("Réponse API invalide (non JSON). Voir contenu brut ci-dessus.")
+                    st.stop()
 
                 predictions = result.get("predictions", [])
                 probas = result.get("proba", [])
@@ -79,8 +89,8 @@ if st.sidebar.button("Prédire"):
                         if i < len(probas):
                             st.json(probas[i])
 
-            except Exception as e:
-                st.error(f"Erreur API: {e}")
+            except requests.exceptions.RequestException as e:
+                st.error(f"Erreur de connexion à l'API: {e}")
     else:
         st.warning("Veuillez saisir des données ou charger un fichier avant de prédire.")
 
