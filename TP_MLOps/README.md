@@ -1,4 +1,9 @@
-#Author: Mènéli Herve Adjole
+
+Auteur
+Mènéli Herve Adjole
+LinkedIn : (https://www.linkedin.com/in/herve-adjole/)
+GitHub : (https://github.com/morxz-dev)
+
 
 Context: Ce dataset est le resultat d'une analyse de vins produit dans une même région en Italie mais par 03 differents producteurs.L'analyse mesure **13 constituants chimiques** 
 (source:https://www.openml.org/search?type=data&status=active&id=43612)
@@ -40,6 +45,10 @@ Lance-la localement avec :
 pip install -r requirements.txt
 streamlit run app.py
 
+Des fichiers d'essaies se trouvent dans le dossier data (try_prediction_0.json, try_prediction_1.json) 
+
+
+
 Exemple de requête JSON
 {
   "features": [
@@ -60,12 +69,6 @@ Exemple de requête JSON
     }
   ]
 }
-
-
-Auteur
-Mènéli Herve Adjole
-LinkedIn : (https://www.linkedin.com/in/herve-adjole/)
-GitHub : (https://github.com/morxz-dev)
 
 
 ### Tâche: Classification (multiclasse)
